@@ -31,24 +31,13 @@ class WC_Nihaopay_Checkout
   public static function includes()
   {
     if (class_exists("WC_Payment_Gateway")) {
-      require_once "class-wc-nihaopay-gateway.php";
+      require_once "includes/class-wc-nihaopay-gateway.php";
     }
   }
 
   public static function add_gateway($gateways)
   {
-    /* $options = get_option("wc-nihaopay-settings", []); */
-    /**/
-    /* if (isset($options["hide_for_regular_user"])) { */
-    /*     $hide = $options["hide_for_regular_user"]; */
-    /* } else { */
-    /*     $hide = false; */
-    /* } */
-    /**/
-    /* if (($hide && current_user_can("manage_options")) || !$hide) { */
     $gateways[] = "WC_Nihaopay_Gateway";
-    /* } */
-
     return $gateways;
   }
 
@@ -75,7 +64,7 @@ class WC_Nihaopay_Checkout
   public static function woocommerce_nihaopay_checkout_woocommerce_block_support()
   {
     if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
-      require_once 'class-wc-nihaopay-checkout-blocks.php';
+      require_once 'includes/class-wc-nihaopay-checkout-blocks.php';
       add_action(
         'woocommerce_blocks_payment_method_type_registration',
         function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {

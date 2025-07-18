@@ -1,5 +1,13 @@
 # NihaoPay WooCommerce Plugin
 
+## DONE
+
+- Visuals
+
+## TODO
+
+- Plugin payment logics
+
 ## build
 
 ```sh

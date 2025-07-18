@@ -23,6 +23,12 @@ const isUnionPayEnabled = decodeEntities(settings.enable_unionpay) === "yes";
 const Content = () => {
   const [selectedOption, setSelectedOption] = useState("");
 
+  const genPPRadioButtonGroup = (pp) => (
+    <>
+      <input type="radio" value={pp} checked={selectedOption === pp} />
+      <p>{pp}</p>
+    </>
+  );
   return (
     <div
       style={{
@@ -41,39 +47,19 @@ const Content = () => {
       >
         <legend>Select method of payment*</legend>
         <div style={{ display: "flex", gap: "20px" }}>
-          {isWechatPayEnabled && (
-            <input
-              type="radio"
-              value="WechatPay"
-              checked={selectedOption === "WechatPay"}
-            />
-          )}
-          <p>WechatPay</p>
+          {isWechatPayEnabled && genPPRadioButtonGroup("WechatPay")}
         </div>
         <div style={{ display: "flex", gap: "20px" }}>
-          {isAlipayEnabled && (
-            <input
-              type="radio"
-              value="AliPay"
-              checked={selectedOption === "AliPay"}
-            />
-          )}
-          <p>AliPay</p>
+          {isAlipayEnabled && genPPRadioButtonGroup("AliPay")}
         </div>
         <div style={{ display: "flex", gap: "20px" }}>
-          {isUnionPayEnabled && (
-            <input
-              type="radio"
-              value="UnionPay"
-              checked={selectedOption === "UnionPay"}
-            />
-          )}
-          <p>UnionPay</p>
+          {isUnionPayEnabled && genPPRadioButtonGroup("UnionPay")}
         </div>
       </fieldset>
     </div>
   );
 };
+
 /**
  * Label component
  *
