@@ -61,6 +61,7 @@ final class WC_Nihaopay_Checkout_Blocks_Support extends AbstractPaymentMethodTyp
     }
   }
 
+  //TODO: pass more data into the js blocks script
   public function get_payment_method_data()
   {
     return [
