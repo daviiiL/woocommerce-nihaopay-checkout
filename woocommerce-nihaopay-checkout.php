@@ -44,7 +44,7 @@ class WC_Nihaopay_Checkout
         /* } */
         /**/
         /* if (($hide && current_user_can("manage_options")) || !$hide) { */
-            $gateways[] = "WC_Nihaopay_Gateway";
+        $gateways[] = "WC_Nihaopay_Gateway";
         /* } */
 
         return $gateways;
