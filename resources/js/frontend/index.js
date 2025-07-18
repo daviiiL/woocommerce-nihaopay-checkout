@@ -100,7 +100,7 @@ const Label = (props) => {
             height: "100%",
             objectFit: "cover",
           }}
-          src={logoMap[pp]}
+          src={logoMap[pp.toLowerCase()]}
           alt={`${pp} logo`}
         />
       </div>
@@ -119,7 +119,7 @@ const Label = (props) => {
     >
       <PaymentMethodLabel text={label} />
       <div style={{ display: "flex", gap: "5px" }}>
-        {["wechatpay", "alipay", "unionpay"].map((pp) =>
+        {["WechatPay", "AliPay", "UnionPay"].map((pp) =>
           genPPIconContainer(pp),
         )}
       </div>
