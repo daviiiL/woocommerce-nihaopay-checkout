@@ -2,17 +2,77 @@ import { sprintf, __ } from "@wordpress/i18n";
 import { registerPaymentMethod } from "@woocommerce/blocks-registry";
 import { decodeEntities } from "@wordpress/html-entities";
 import { getSetting } from "@woocommerce/settings";
+import { useState } from "@wordpress/element";
+import alipayLogo from "../../images/alipay_logo.png";
+import unionpayLogo from "../../images/unionpay_logo.png";
+import wechatpayLogo from "../../images/wechatpay_logo.png";
 
 const settings = getSetting("nihaopay_data", {});
 
 const defaultLabel = __("NihaoPay Checkout", "woo-gutenberg-products-block");
 
 const label = decodeEntities(settings.title) || defaultLabel;
+
+const isWechatPayEnabled = decodeEntities(settings.enable_wechatpay) === "yes";
+const isAlipayEnabled = decodeEntities(settings.enable_alipay) === "yes";
+const isUnionPayEnabled = decodeEntities(settings.enable_unionpay) === "yes";
+
 /**
  * Content component
  */
 const Content = () => {
-  return decodeEntities(settings.description || "");
+  const [selectedOption, setSelectedOption] = useState("");
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "flex-start",
+      }}
+      onChange={(e) => {
+        setSelectedOption(e.target.value);
+      }}
+    >
+      <fieldset
+        style={{
+          flexGrow: "1",
+        }}
+      >
+        <legend>Select method of payment*</legend>
+        <div style={{ display: "flex", gap: "20px" }}>
+          {isWechatPayEnabled && (
+            <input
+              type="radio"
+              value="WechatPay"
+              checked={selectedOption === "WechatPay"}
+            />
+          )}
+          <p>WechatPay</p>
+        </div>
+        <div style={{ display: "flex", gap: "20px" }}>
+          {isAlipayEnabled && (
+            <input
+              type="radio"
+              value="AliPay"
+              checked={selectedOption === "AliPay"}
+            />
+          )}
+          <p>AliPay</p>
+        </div>
+        <div style={{ display: "flex", gap: "20px" }}>
+          {isUnionPayEnabled && (
+            <input
+              type="radio"
+              value="UnionPay"
+              checked={selectedOption === "UnionPay"}
+            />
+          )}
+          <p>UnionPay</p>
+        </div>
+      </fieldset>
+    </div>
+  );
 };
 /**
  * Label component
@@ -20,12 +80,55 @@ const Content = () => {
  * @param {*} props Props from payment API.
  */
 const Label = (props) => {
+  const logoMap = {
+    wechatpay: wechatpayLogo,
+    alipay: alipayLogo,
+    unionpay: unionpayLogo,
+  };
+
+  const genPPIconContainer = (pp) => {
+    return (
+      <div
+        style={{
+          height: "24px",
+          maxHeight: "24px",
+          width: "fit-content",
+        }}
+      >
+        <img
+          style={{
+            height: "100%",
+            objectFit: "cover",
+          }}
+          src={logoMap[pp]}
+          alt={`${pp} logo`}
+        />
+      </div>
+    );
+  };
+
   const { PaymentMethodLabel } = props.components;
-  return <PaymentMethodLabel text={label} />;
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      <PaymentMethodLabel text={label} />
+      <div style={{ display: "flex", gap: "5px" }}>
+        {["wechatpay", "alipay", "unionpay"].map((pp) =>
+          genPPIconContainer(pp),
+        )}
+      </div>
+    </div>
+  );
 };
 
 /**
- * Dummy payment method config object.
+ * NihaoPay Checkout Config Object
  */
 const NihaoPay = {
   name: "nihaopay",

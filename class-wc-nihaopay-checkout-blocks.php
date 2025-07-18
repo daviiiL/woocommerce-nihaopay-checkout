@@ -25,7 +25,7 @@ final class WC_Nihaopay_Checkout_Blocks_Support extends AbstractPaymentMethodTyp
 
   public function initialize()
   {
-    $this->settings = get_option('wc_nihaopay_settings', []);
+    $this->settings = get_option("woocommerce_nihaopay_settings", []);
     $gateways = WC()->payment_gateways->payment_gateways();
     $this->gateway = $gateways[$this->name];
   }
@@ -65,7 +65,10 @@ final class WC_Nihaopay_Checkout_Blocks_Support extends AbstractPaymentMethodTyp
   public function get_payment_method_data()
   {
     return [
-      "title" => $this->get_setting('title')
+      "title" => $this->get_setting('title'),
+      "enable_wechatpay" => $this->get_setting("enable_wechatpay"),
+      "enable_alipay" => $this->get_setting("enable_alipay"),
+      "enable_unionpay" => $this->get_setting("enable_unionpay")
     ];
   }
 }
