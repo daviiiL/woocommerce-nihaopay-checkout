@@ -28,8 +28,26 @@ class WC_Nihaopay_Checkout
     add_action("woocommerce_blocks_loaded", [__CLASS__, "woocommerce_nihaopay_checkout_woocommerce_block_support"]);
 
     // add session data get action
-    add_action('wp_ajax_get_session_data', 'get_session_data_callback');
-    add_action('wp_ajax_nopriv_get_session_data', 'get_session_data_callback');
+    add_action(
+      'wp_ajax_get_session_data',
+      function () {
+        global $woocommerce;
+        $key_to_get = isset($_GET['orderId']) ? sanitize_text_field($_GET['orderId']) : '';
+        $data = $woocommerce->session->get($key_to_get);
+        wp_send_json([$key_to_get => $data]);
+        wp_die();
+      }
+    );
+    add_action(
+      'wp_ajax_nopriv_get_session_data',
+      function () {
+        global $woocommerce;
+        $key_to_get = isset($_GET['orderId']) ? sanitize_text_field($_GET['orderId']) : '';
+        $data = $woocommerce->session->get($key_to_get);
+        wp_send_json([$key_to_get => $data]);
+        wp_die();
+      }
+    );
 
     add_action('init', function () {
       add_rewrite_rule('^nihaopay-redirect/?$', 'index.php?nihaopay_redirect=1', 'top');
@@ -232,15 +250,6 @@ class WC_Nihaopay_Checkout
       </html><?php
               exit;
             }
-          }
-
-          function get_session_data_callback()
-          {
-            global $woocommerce;
-            $key_to_get = isset($_GET['orderId']) ? sanitize_text_field($_GET['orderId']) : '';
-            $data = $woocommerce->session->get($key_to_get);
-            wp_send_json([$key_to_get => $data]);
-            wp_die();
           }
         }
 
