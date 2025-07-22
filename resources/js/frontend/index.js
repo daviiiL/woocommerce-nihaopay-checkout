@@ -2,7 +2,7 @@ import { sprintf, __ } from "@wordpress/i18n";
 import { registerPaymentMethod } from "@woocommerce/blocks-registry";
 import { decodeEntities } from "@wordpress/html-entities";
 import { getSetting } from "@woocommerce/settings";
-import { useState } from "@wordpress/element";
+import { useState, useEffect } from "@wordpress/element";
 import alipayLogo from "../../images/alipay_logo.png";
 import unionpayLogo from "../../images/unionpay_logo.png";
 import wechatpayLogo from "../../images/wechatpay_logo.png";
@@ -20,8 +20,43 @@ const isUnionPayEnabled = decodeEntities(settings.enable_unionpay) === "yes";
 /**
  * Content component
  */
-const Content = () => {
+const Content = ({ eventRegistration, emitResponse }) => {
   const [selectedOption, setSelectedOption] = useState("");
+  const { onPaymentProcessing } = eventRegistration;
+
+  const vendorMap = {
+    wechatpay: isWechatPayEnabled,
+    alipay: isAlipayEnabled,
+    unionpay: isUnionPayEnabled,
+  };
+
+  useEffect(() => {
+    const unsubscribe = onPaymentProcessing(async () => {
+      const vendor = selectedOption?.toLowerCase() || "";
+
+      if (!vendor || !vendorMap[vendor])
+        return {
+          type: emitResponse.responseTypes.ERROR,
+          message: `Please select a payment method`,
+        };
+
+      return {
+        type: emitResponse.responseTypes.SUCCESS,
+        meta: {
+          paymentMethodData: {
+            vendor,
+          },
+        },
+      };
+    });
+
+    return () => unsubscribe();
+  }, [
+    emitResponse.responseTypes.ERROR,
+    emitResponse.responseTypes.SUCCESS,
+    onPaymentProcessing,
+    selectedOption,
+  ]);
 
   const genPPRadioButtonGroup = (pp) => (
     <>

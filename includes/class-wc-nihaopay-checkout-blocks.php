@@ -68,7 +68,8 @@ final class WC_Nihaopay_Checkout_Blocks_Support extends AbstractPaymentMethodTyp
       "title" => $this->get_setting('title'),
       "enable_wechatpay" => $this->get_setting("enable_wechatpay"),
       "enable_alipay" => $this->get_setting("enable_alipay"),
-      "enable_unionpay" => $this->get_setting("enable_unionpay")
+      "enable_unionpay" => $this->get_setting("enable_unionpay"),
+
     ];
   }
 }
