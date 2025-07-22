@@ -25,7 +25,12 @@ const Content = () => {
 
   const genPPRadioButtonGroup = (pp) => (
     <>
-      <input type="radio" value={pp} checked={selectedOption === pp} />
+      <input
+        name="vendor"
+        type="radio"
+        value={pp}
+        checked={selectedOption === pp}
+      />
       <p>{pp}</p>
     </>
   );
