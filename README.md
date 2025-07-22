@@ -3,10 +3,11 @@
 ## DONE
 
 - Visuals
+- Plugin payment logics
 
 ## TODO
 
-- Plugin payment logics
+- investigate and fix the redirection logic
 
 ## build
 
