@@ -59,7 +59,9 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
     $this->is_in_wechat_app = $this->is_in_wechat_app();
     $this->is_mobile = $this->is_mobile();
     //whether if the checkout is block (js/react) or classic (php)
-    $this->is_checkout_block = $this->is_checkout_block();
+    // FIXME: not available before woo 8
+    //
+    // $this->is_checkout_block = $this->is_checkout_block(); 
 
     add_action("woocommerce_receipt_" . $this->id, [$this, "receipt_page"]);
     add_action("woocommerce_update_options_payment_gateways_" . $this->id, [
@@ -319,10 +321,13 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
     );
   }
 
-  function is_checkout_block()
-  {
-    return \Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils::is_checkout_block_default();
-  }
+  /**
+   * checks if merchant store is defaulting block or classic checkout
+   */
+  /* function is_checkout_block() */
+  /* { */
+  /*   return \Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils::is_checkout_block_default(); */
+  /* } */
 
   function is_in_wechat_app()
   {
@@ -378,10 +383,9 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
     $nhp_arg['note'] = $order_id;
 
     // if block checkout / classic checkout 
-    if ($this->is_checkout_block()) {
-      $vendor = WC()->checkout->get_value('vendor') ? WC()->checkout->get_value('vendor') : "";
-    } else {
-      $vendor = isset($_POST['vendor']) ? $_POST['vendor'] : "";
+    $vendor = WC()->checkout->get_value('vendor');
+    if (!$vendor) {
+      $vendor = isset($_POST['vendor']) ? $_POST['vendor'] : '';
     }
 
     if ($vendor === 'alipay' && !$this->isAliPayEnabled()) {
