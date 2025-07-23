@@ -113,22 +113,22 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
   {
     $plugin_dir = WC_Nihaopay_Checkout::plugin_url();
     $plugin_path = WC_Nihaopay_Checkout::plugin_abspath();
-    
+
     // First try assets directory (built files with hashes)
     $assets_pattern = $plugin_path . 'assets/js/images/' . $base_name . '.*.png';
     $assets_files = glob($assets_pattern);
-    
+
     if (!empty($assets_files)) {
       $filename = basename($assets_files[0]);
       return $plugin_dir . '/assets/js/images/' . $filename;
     }
-    
+
     // Fallback to resources directory (development)
     $resources_file = $plugin_path . 'resources/images/' . $base_name . '.png';
     if (file_exists($resources_file)) {
       return $plugin_dir . '/resources/images/' . $base_name . '.png';
     }
-    
+
     return '';
   }
 
@@ -169,22 +169,42 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
   {
     global $woocommerce;
   ?>
+    <style>
+      div.vendor-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 2rem;
+      }
+
+      div.vendors-container {
+        height: "100%";
+        width: "100%";
+        display: "flex";
+        align-items: flex-start;
+      }
+
+      label.vendor-label {
+        margin: 0;
+        padding-left: 2rem;
+      }
+    </style>
     <fieldset>
-      <legend class="payment-method-title"><label>Method of payment<span class="required">*</span></label></legend>
-      <ul class="wc_payment_methods payment_methods methods">
+      <legend><label>Method of payment*</label></legend>
+      <div class="vendors-container">
         <?php if ($this->isAliPayEnabled()) : ?>
-          <li class="wc_payment_method">
+          <div class="vendor-container">
             <input id="nihaopay_pay_method_alipay"
               class="input-radio"
               name="vendor"
               checked="checked"
               value="alipay"
               data-order_button_text="" type="radio" required>
-            <label for="nihaopay_pay_method_alipay">AliPay</label>
-          </li>
+            <label class="vendor-label" for="nihaopay_pay_method_alipay">AliPay</label>
+          </div>
         <?php endif; ?>
         <?php if ($this->isWechatPayEnabled()) : ?>
-          <li class="wc_payment_method">
+          <div class="vendor-container">
             <input id="nihaopay_pay_method_wechatpay"
               class="input-radio"
               name="vendor"
@@ -193,11 +213,11 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
               type="radio"
               required
               <?php echo !$this->isAliPayEnabled() ?  'checked=\"checked\"' : ""; ?>>
-            <label for="nihaopay_pay_method_wechatpay">WeChatPay</label>
-          </li>
+            <label class="vendor-label" for="nihaopay_pay_method_wechatpay">WeChatPay</label>
+          </div>
         <?php endif; ?>
         <?php if ($this->isUnionPayEnabled()) : ?>
-          <li class="wc_payment_method">
+          <div class="vendor-container">
             <input id="nihaopay_pay_method_unionpay"
               class="input-radio"
               name="vendor"
@@ -206,11 +226,11 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
               type="radio"
               required
               <?php echo !($this->isWechatPayEnabled() && $this->isAliPayEnabled()) ? 'checked=\"checked\"' : ""; ?>>
-            <label for="nihaopay_pay_method_unionpay">UnionPay</label>
-          </li>
+            <label class="vendor-label" for="nihaopay_pay_method_unionpay">UnionPay</label>
+          </div>
         <?php endif; ?>
-      </ul>
-      <div class="clear"></div>
+        </ul>
+        <div class="clear"></div>
     </fieldset>
 <?php
   }

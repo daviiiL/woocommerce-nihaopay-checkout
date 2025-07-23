@@ -102,17 +102,29 @@ npm run build --silent
 
 # Create release ZIP
 echo -e "${YELLOW}Creating release package...${NC}"
-zip -r "woocommerce-nihaopay-checkout-${VERSION}.zip" . \
-    -x "node_modules/*" \
-       "resources/*" \
-       "package*.json" \
-       "webpack.config.js" \
-       "bin/*" \
-       ".git*" \
-       "build_release.*" \
-       "*.md" \
-       ".DS_Store" \
-       "Thumbs.db"
+
+# Create temp directory for building the zip
+TEMP_DIR=$(mktemp -d)
+mkdir -p "$TEMP_DIR/woocommerce-nihaopay-checkout"
+
+# Copy required files
+cp woocommerce-nihaopay-checkout.php "$TEMP_DIR/woocommerce-nihaopay-checkout/"
+cp -r includes/ "$TEMP_DIR/woocommerce-nihaopay-checkout/"
+cp -r assets/ "$TEMP_DIR/woocommerce-nihaopay-checkout/"
+
+# Include languages directory if it exists
+if [ -d "languages" ]; then
+    cp -r languages/ "$TEMP_DIR/woocommerce-nihaopay-checkout/"
+fi
+
+# Create the zip from temp directory
+cd "$TEMP_DIR"
+zip -r "woocommerce-nihaopay-checkout-${VERSION}.zip" woocommerce-nihaopay-checkout/
+mv "woocommerce-nihaopay-checkout-${VERSION}.zip" "$OLDPWD/"
+cd "$OLDPWD"
+
+# Clean up
+rm -rf "$TEMP_DIR"
 
 echo -e "${GREEN}✓ Release package created: woocommerce-nihaopay-checkout-${VERSION}.zip${NC}"
 
