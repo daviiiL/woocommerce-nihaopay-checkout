@@ -43,3 +43,6 @@ Thumbs.db
 select2.scss
 /assets/
 /languages/
+
+# Built zips
+*.zip

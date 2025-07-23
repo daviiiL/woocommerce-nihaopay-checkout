@@ -76,7 +76,7 @@ const Content = ({ eventRegistration, emitResponse }) => {
         name="vendor"
         type="radio"
         value={vendor}
-        checked={selectedOption === pp}
+        checked={selectedOption === vendor}
       />
       <p>{vendor}</p>
     </>
@@ -139,7 +139,7 @@ const Label = (props) => {
             height: "100%",
             objectFit: "cover",
           }}
-          src={logoMap[pp.toLowerCase()]}
+          src={logoMap[vendor.toLowerCase()]}
           alt={`${vendor} logo`}
         />
       </div>

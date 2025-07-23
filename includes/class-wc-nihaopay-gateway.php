@@ -48,10 +48,9 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
     $this->enable_wechatpay = $this->get_option("enable_wechatpay");
     $this->enable_unionpay = $this->get_option("enable_unionpay");
 
-    $plugin_dir = WC_Nihaopay_Checkout::plugin_url();
-    $this->wechatpay_icon = apply_filters('woocommerce_nihaopay_wechatpay_icon', '' . $plugin_dir . '/resources/images/wechatpay_logo.png');
-    $this->alipay_icon = apply_filters('woocommerce_nihaopay_alipay_icon', '' . $plugin_dir . '/resources/images/alipay_logo.png');
-    $this->unionpay_icon = apply_filters('woocommerce_nihaopay_unionpay_icon', '' . $plugin_dir . '/resources/images/unionpay_logo.png');
+    $this->wechatpay_icon = apply_filters('woocommerce_nihaopay_wechatpay_icon', $this->get_icon_url('wechatpay_logo'));
+    $this->alipay_icon = apply_filters('woocommerce_nihaopay_alipay_icon', $this->get_icon_url('alipay_logo'));
+    $this->unionpay_icon = apply_filters('woocommerce_nihaopay_unionpay_icon', $this->get_icon_url('unionpay_logo'));
 
     $this->gateway_url = $this->mode === "live" ? "https://api.nihaopay.com/v1.2/transactions/securepay" : "https://apitest.nihaopay.com/v1.2/transactions/securepay";
     $this->notify_url = add_query_arg("wc-api", "wc_nihaopay", home_url("/"));
@@ -105,6 +104,32 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
     }
 
     return apply_filters('woocommerce_gateway_icons', $icon, $this->id);
+  }
+
+  /**
+   * Get icon URL with hash support
+   */
+  private function get_icon_url($base_name)
+  {
+    $plugin_dir = WC_Nihaopay_Checkout::plugin_url();
+    $plugin_path = WC_Nihaopay_Checkout::plugin_abspath();
+    
+    // First try assets directory (built files with hashes)
+    $assets_pattern = $plugin_path . 'assets/js/images/' . $base_name . '.*.png';
+    $assets_files = glob($assets_pattern);
+    
+    if (!empty($assets_files)) {
+      $filename = basename($assets_files[0]);
+      return $plugin_dir . '/assets/js/images/' . $filename;
+    }
+    
+    // Fallback to resources directory (development)
+    $resources_file = $plugin_path . 'resources/images/' . $base_name . '.png';
+    if (file_exists($resources_file)) {
+      return $plugin_dir . '/resources/images/' . $base_name . '.png';
+    }
+    
+    return '';
   }
 
   /**
