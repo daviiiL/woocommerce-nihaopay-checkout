@@ -29,7 +29,6 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
 
   public function __construct()
   {
-    // has_fields shows payment fields on checkout
     $this->has_fields = true;
     $this->method_title = "NihaoPay Checkout";
     $this->method_description = "Enables WechatPay, AliPay, and UnionPay";
@@ -59,7 +58,6 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
 
     $this->is_in_wechat_app = $this->is_in_wechat_app();
     $this->is_mobile = $this->is_mobile();
-
     //whether if the checkout is block (js/react) or classic (php)
     $this->is_checkout_block = $this->is_checkout_block();
 
@@ -68,7 +66,6 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
       $this,
       "process_admin_options",
     ]);
-
     add_action("woocommerce_api_wc_nihaopay", [$this, "check_ipn_response"]);
   }
 
@@ -84,7 +81,6 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
     </table>
   <?php
   }
-
 
   function get_icon()
   {
@@ -140,6 +136,7 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
       null !== $this->get_option("enable_unionpay") &&
       $this->get_option("enable_unionpay") === "yes";
   }
+
   /* for classic checkout */
   function payment_fields()
   {
@@ -190,7 +187,6 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
     </fieldset>
 <?php
   }
-
 
   public function init_form_fields()
   {
@@ -411,24 +407,11 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
       $nhp_arg['inWechat'] = $this->is_in_wechat_app ? 'true' : 'false';
     }
 
-
     $post_values = "";
     foreach ($nhp_arg as $key => $value) {
       $post_values .= "$key=" . $value . "&";
     }
     $post_values = rtrim($post_values, "& ");
-
-    /* block  */
-    /* DEBUG] payment informations{"0":[],"currency":"USD","amount":199,"ipn_url":"http:\\/\\/localhost\\/?wc-api=wc_nihaopay","callback_url":"http:\\/\\/localhost\\/checkout\\/order-received\\/14\\/?key=wc_order_haPMEWYYMrIaf","reference":"20250722194452-14","note":14,"vendor":"","terminal":"ONLINE"}, referer: http://localhost/checkout/ */
-    /**/
-
-    /*    classic  */
-    /* [DEBUG] payment informations{"0":[],"currency":"USD","amount":199,"ipn_url":"http:\\/\\/localhost\\/?wc-api=wc_nihaopay","callback_url":"http:\\/\\/localhost\\/checkout\\/order-received\\/18\\/?key=wc_order_l4D3wHVbM5mR6","reference":"20250722194822-18","note":18,"vendor":"alipay","terminal":"ONLINE"}, referer: http://localhost/checkout/ */
-    /**/
-
-    error_log("-----------------------------------------------------");
-    error_log("[DEBUG] payment informations" . json_encode($nhp_arg));
-
     $response = wp_remote_post($this->gateway_url, array(
       'body' => $post_values,
       'method' => 'POST',

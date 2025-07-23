@@ -61,7 +61,6 @@ final class WC_Nihaopay_Checkout_Blocks_Support extends AbstractPaymentMethodTyp
     }
   }
 
-  //TODO: pass more data into the js blocks script
   public function get_payment_method_data()
   {
     return [
@@ -69,7 +68,6 @@ final class WC_Nihaopay_Checkout_Blocks_Support extends AbstractPaymentMethodTyp
       "enable_wechatpay" => $this->get_setting("enable_wechatpay"),
       "enable_alipay" => $this->get_setting("enable_alipay"),
       "enable_unionpay" => $this->get_setting("enable_unionpay"),
-
     ];
   }
 }

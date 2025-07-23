@@ -1,13 +1,14 @@
 # NihaoPay WooCommerce Plugin
 
-## DONE
+## Supports
 
-- Visuals
-- Plugin payment logics
+- minimum PHP version:
+- minimum WooCommerce Plugin version:
+- Tested WooCommerce version up to ?
 
-## TODO
+## Usage
 
-- investigate and fix the redirection logic
+Download and unzip the latest release from this repository's release tab to your wordpress plugin directory.
 
 ## build
 

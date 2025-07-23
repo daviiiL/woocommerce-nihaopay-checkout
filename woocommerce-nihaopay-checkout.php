@@ -57,6 +57,12 @@ class WC_Nihaopay_Checkout
     add_action('template_redirect', [__CLASS__, 'handle_redirect_template']);
   }
 
+  function add_rewrite()
+  {
+    add_rewrite_rule('^nihaopay-redirect/?$', 'index.php?nihaopay_redirect=1', 'top');
+    add_rewrite_tag('%nihaopay_redirect%', '1');
+  }
+
   public static function includes()
   {
     if (class_exists("WC_Payment_Gateway")) {

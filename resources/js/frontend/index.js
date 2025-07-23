@@ -58,17 +58,30 @@ const Content = ({ eventRegistration, emitResponse }) => {
     selectedOption,
   ]);
 
-  const genPPRadioButtonGroup = (pp) => (
+  // set default option
+  useEffect(() => {
+    if (isWechatPayEnabled) setSelectedOption("WechatPay");
+    else if (isAlipayEnabled) setSelectedOption("AliPay");
+    else setSelectedOption("UnionPay");
+  }, [
+    setSelectedOption,
+    isWechatPayEnabled,
+    isAlipayEnabled,
+    isUnionPayEnabled,
+  ]);
+
+  const genVendorRadioButtonGroup = (vendor) => (
     <>
       <input
         name="vendor"
         type="radio"
-        value={pp}
+        value={vendor}
         checked={selectedOption === pp}
       />
-      <p>{pp}</p>
+      <p>{vendor}</p>
     </>
   );
+
   return (
     <div
       style={{
@@ -87,13 +100,13 @@ const Content = ({ eventRegistration, emitResponse }) => {
       >
         <legend>Select method of payment*</legend>
         <div style={{ display: "flex", gap: "20px" }}>
-          {isWechatPayEnabled && genPPRadioButtonGroup("WechatPay")}
+          {isWechatPayEnabled && genVendorRadioButtonGroup("WechatPay")}
         </div>
         <div style={{ display: "flex", gap: "20px" }}>
-          {isAlipayEnabled && genPPRadioButtonGroup("AliPay")}
+          {isAlipayEnabled && genVendorRadioButtonGroup("AliPay")}
         </div>
         <div style={{ display: "flex", gap: "20px" }}>
-          {isUnionPayEnabled && genPPRadioButtonGroup("UnionPay")}
+          {isUnionPayEnabled && genVendorRadioButtonGroup("UnionPay")}
         </div>
       </fieldset>
     </div>
@@ -112,7 +125,7 @@ const Label = (props) => {
     unionpay: unionpayLogo,
   };
 
-  const genPPIconContainer = (pp) => {
+  const genVendorIconContainer = (vendor) => {
     return (
       <div
         style={{
@@ -127,7 +140,7 @@ const Label = (props) => {
             objectFit: "cover",
           }}
           src={logoMap[pp.toLowerCase()]}
-          alt={`${pp} logo`}
+          alt={`${vendor} logo`}
         />
       </div>
     );
@@ -145,8 +158,8 @@ const Label = (props) => {
     >
       <PaymentMethodLabel text={label} />
       <div style={{ display: "flex", gap: "5px" }}>
-        {["WechatPay", "AliPay", "UnionPay"].map((pp) =>
-          genPPIconContainer(pp),
+        {["WechatPay", "AliPay", "UnionPay"].map((vendor) =>
+          genVendorIconContainer(vendor),
         )}
       </div>
     </div>
