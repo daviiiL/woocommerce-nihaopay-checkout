@@ -72,8 +72,18 @@ VERSION=$(grep "Version:" woocommerce-nihaopay-checkout.php | sed 's/.*Version: 
 
 echo -e "${YELLOW}Building WooCommerce NihaoPay Checkout v${VERSION}...${NC}"
 
-# Clean up any existing build
+# Check for existing build and ask for confirmation
 if [ -f "woocommerce-nihaopay-checkout-${VERSION}.zip" ]; then
+    echo -e "${YELLOW}WARNING: A release file with the same version already exists:${NC}"
+    echo -e "${YELLOW}  - File: woocommerce-nihaopay-checkout-${VERSION}.zip${NC}"
+    echo -e "${YELLOW}  - Version: ${VERSION}${NC}"
+    echo -e ""
+    read -p "Do you want to overwrite the existing file? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "${RED}Build cancelled by user.${NC}"
+        exit 1
+    fi
     echo -e "${YELLOW}Removing existing release file...${NC}"
     rm "woocommerce-nihaopay-checkout-${VERSION}.zip"
 fi

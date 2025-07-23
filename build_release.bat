@@ -63,8 +63,19 @@ for /f "tokens=2 delims=:" %%a in ('findstr /C:"Version:" woocommerce-nihaopay-c
 
 echo Building version !VERSION!...
 
-:: Clean up any existing build
+:: Check for existing build and ask for confirmation
 if exist "woocommerce-nihaopay-checkout-!VERSION!.zip" (
+    echo.
+    echo WARNING: A release file with the same version already exists:
+    echo   - File: woocommerce-nihaopay-checkout-!VERSION!.zip
+    echo   - Version: !VERSION!
+    echo.
+    set /p "OVERWRITE=Do you want to overwrite the existing file? (y/N): "
+    if /i not "!OVERWRITE!"=="y" (
+        echo Build cancelled by user.
+        pause
+        exit /b 1
+    )
     echo Removing existing release file...
     del "woocommerce-nihaopay-checkout-!VERSION!.zip"
 )
