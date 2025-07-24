@@ -1,22 +1,16 @@
 #!/bin/bash
 
-# WooCommerce NihaoPay Checkout - Release Build Script
-# This script builds the plugin and creates a release ZIP file
-
 set -e
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Function to check if command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to check Node.js version
 check_node_version() {
     if ! command_exists node; then
         return 1
@@ -25,110 +19,83 @@ check_node_version() {
     local version=$(node -v | sed 's/v//')
     local major_version=$(echo $version | cut -d. -f1)
     
-    if [ "$major_version" -ge 20 ]; then
-        return 0
-    else
-        return 1
-    fi
+    [ "$major_version" -ge 20 ]
 }
 
-# Check system requirements
 echo -e "${YELLOW}Checking system requirements...${NC}"
 
-# Check for zip
-if ! command_exists zip; then
-    echo -e "${RED}ERROR: 'zip' command not found. Please install zip utility.${NC}"
-    echo -e "${YELLOW}On Ubuntu/Debian: sudo apt-get install zip${NC}"
-    echo -e "${YELLOW}On CentOS/RHEL: sudo yum install zip${NC}"
-    echo -e "${YELLOW}On macOS: zip is usually pre-installed${NC}"
-    exit 1
-fi
-
-# Check for Node.js 20+
-if ! check_node_version; then
-    if ! command_exists node; then
-        echo -e "${RED}ERROR: Node.js not found. Please install Node.js 20 or higher.${NC}"
-    else
-        local current_version=$(node -v)
-        echo -e "${RED}ERROR: Node.js version ${current_version} found, but version 20+ is required.${NC}"
+for cmd in php wp zip; do
+    if ! command_exists $cmd; then
+        echo -e "${RED}ERROR: '$cmd' command not found.${NC}"
+        exit 1
     fi
-    echo -e "${YELLOW}Visit https://nodejs.org/ to download Node.js 20+${NC}"
+done
+
+if ! check_node_version; then
+    echo -e "${RED}ERROR: Node.js 20+ required.${NC}"
     exit 1
 fi
 
-# Check for npm
 if ! command_exists npm; then
-    echo -e "${RED}ERROR: npm not found. Please install npm (usually comes with Node.js).${NC}"
+    echo -e "${RED}ERROR: npm not found.${NC}"
     exit 1
 fi
 
 echo -e "${GREEN}✓ All system requirements satisfied${NC}"
-echo -e "${GREEN}  - zip: $(zip --version | head -n1)${NC}"
-echo -e "${GREEN}  - Node.js: $(node -v)${NC}"
-echo -e "${GREEN}  - npm: $(npm -v)${NC}"
 
-# Get plugin version from main plugin file
 VERSION=$(grep "Version:" woocommerce-nihaopay-checkout.php | sed 's/.*Version: *//' | sed 's/ *$//')
 
 echo -e "${YELLOW}Building WooCommerce NihaoPay Checkout v${VERSION}...${NC}"
 
-# Check for existing build and ask for confirmation
 if [ -f "woocommerce-nihaopay-checkout-${VERSION}.zip" ]; then
-    echo -e "${YELLOW}WARNING: A release file with the same version already exists:${NC}"
-    echo -e "${YELLOW}  - File: woocommerce-nihaopay-checkout-${VERSION}.zip${NC}"
-    echo -e "${YELLOW}  - Version: ${VERSION}${NC}"
-    echo -e ""
-    read -p "Do you want to overwrite the existing file? (y/N): " -n 1 -r
+    echo -e "${YELLOW}WARNING: Release file already exists.${NC}"
+    read -p "Overwrite? (y/N): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo -e "${RED}Build cancelled by user.${NC}"
+        echo -e "${RED}Build cancelled.${NC}"
         exit 1
     fi
-    echo -e "${YELLOW}Removing existing release file...${NC}"
     rm "woocommerce-nihaopay-checkout-${VERSION}.zip"
 fi
 
-# Check for package updates
 echo -e "${YELLOW}Checking for package updates...${NC}"
 npm run packages-update
 
-# Install dependencies
 echo -e "${YELLOW}Installing dependencies...${NC}"
 npm install
 
-# Build the plugin
 echo -e "${YELLOW}Building plugin assets...${NC}"
 npm run build --silent
 
-# Create release ZIP
 echo -e "${YELLOW}Creating release package...${NC}"
 
-# Create temp directory for building the zip
 TEMP_DIR=$(mktemp -d)
-mkdir -p "$TEMP_DIR/woocommerce-nihaopay-checkout"
+PLUGIN_DIR="$TEMP_DIR/woocommerce-nihaopay-checkout"
+mkdir -p "$PLUGIN_DIR"
 
-# Copy required files
-cp woocommerce-nihaopay-checkout.php "$TEMP_DIR/woocommerce-nihaopay-checkout/"
-cp -r includes/ "$TEMP_DIR/woocommerce-nihaopay-checkout/"
-cp -r assets/ "$TEMP_DIR/woocommerce-nihaopay-checkout/"
+cp woocommerce-nihaopay-checkout.php "$PLUGIN_DIR/"
 
-# Include languages directory if it exists
-if [ -d "languages" ]; then
-    cp -r languages/ "$TEMP_DIR/woocommerce-nihaopay-checkout/"
+for dir in includes assets languages; do
+    [ -d "$dir" ] && cp -r "$dir" "$PLUGIN_DIR/"
+done
+
+[ -f "README.txt" ] && cp README.txt "$PLUGIN_DIR/" || [ -f "readme.txt" ] && cp readme.txt "$PLUGIN_DIR/"
+
+if [ ! -f "$PLUGIN_DIR/woocommerce-nihaopay-checkout.php" ]; then
+    echo -e "${RED}ERROR: Main plugin file not found${NC}"
+    rm -rf "$TEMP_DIR"
+    exit 1
 fi
 
-# Create the zip from temp directory
 cd "$TEMP_DIR"
 zip -r "woocommerce-nihaopay-checkout-${VERSION}.zip" woocommerce-nihaopay-checkout/
 mv "woocommerce-nihaopay-checkout-${VERSION}.zip" "$OLDPWD/"
 cd "$OLDPWD"
 
-# Clean up
 rm -rf "$TEMP_DIR"
 
 echo -e "${GREEN}✓ Release package created: woocommerce-nihaopay-checkout-${VERSION}.zip${NC}"
 
-# Show package contents
 echo -e "${YELLOW}Package contents:${NC}"
 unzip -l "woocommerce-nihaopay-checkout-${VERSION}.zip"
 

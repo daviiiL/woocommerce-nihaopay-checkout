@@ -107,14 +107,13 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
   }
 
   /**
-   * Get icon URL with hash support
+   * Get icon URL 
    */
   private function get_icon_url($base_name)
   {
     $plugin_dir = WC_Nihaopay_Checkout::plugin_url();
     $plugin_path = WC_Nihaopay_Checkout::plugin_abspath();
 
-    // First try assets directory (built files with hashes)
     $assets_pattern = $plugin_path . 'assets/js/images/' . $base_name . '.*.png';
     $assets_files = glob($assets_pattern);
 
@@ -123,7 +122,7 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
       return $plugin_dir . '/assets/js/images/' . $filename;
     }
 
-    // Fallback to resources directory (development)
+    // fallback to resources (dev env)
     $resources_file = $plugin_path . 'resources/images/' . $base_name . '.png';
     if (file_exists($resources_file)) {
       return $plugin_dir . '/resources/images/' . $base_name . '.png';
@@ -229,8 +228,8 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
             <label class="vendor-label" for="nihaopay_pay_method_unionpay">UnionPay</label>
           </div>
         <?php endif; ?>
-        </ul>
-        <div class="clear"></div>
+      </div>
+      <div class="clear"></div>
     </fieldset>
 <?php
   }
