@@ -460,6 +460,7 @@ class WC_Nihaopay_Gateway extends WC_Payment_Gateway
       $post_values .= "$key=" . $value . "&";
     }
     $post_values = rtrim($post_values, "& ");
+
     $response = wp_remote_post($this->gateway_url, array(
       'body' => $post_values,
       'method' => 'POST',
