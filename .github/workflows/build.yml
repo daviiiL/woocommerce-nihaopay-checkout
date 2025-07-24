@@ -1,0 +1,77 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: wp-cli
+
+      - name: Get plugin version
+        id: version
+        run: |
+          VERSION=$(grep "Version:" woocommerce-nihaopay-checkout.php | sed 's/.*Version: *//' | sed 's/ *$//')
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Plugin version: $VERSION"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Update packages
+        run: npm run packages-update
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Create release package
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          TEMP_DIR=$(mktemp -d)
+          PLUGIN_DIR="$TEMP_DIR/woocommerce-nihaopay-checkout"
+
+          mkdir -p "$PLUGIN_DIR"
+          cp woocommerce-nihaopay-checkout.php "$PLUGIN_DIR/"
+
+          for dir in includes assets languages; do
+            [ -d "$dir" ] && cp -r "$dir" "$PLUGIN_DIR/"
+          done
+
+          cd "$TEMP_DIR"
+          zip -r "woocommerce-nihaopay-checkout-${VERSION}.zip" woocommerce-nihaopay-checkout/
+          mv "woocommerce-nihaopay-checkout-${VERSION}.zip" "$GITHUB_WORKSPACE/"
+
+          cd "$GITHUB_WORKSPACE"
+          rm -rf "$TEMP_DIR"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: woocommerce-nihaopay-checkout-${{ steps.version.outputs.VERSION }}
+          path: woocommerce-nihaopay-checkout-${{ steps.version.outputs.VERSION }}.zip
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: woocommerce-nihaopay-checkout-${{ steps.version.outputs.VERSION }}.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
